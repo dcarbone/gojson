@@ -1,0 +1,36 @@
+{
+  "name":              "dcarbone/gojson",
+  "description":       "PHP lib intended to assist in marshalling and unmarshalling JSON data from Golang-based services",
+  "minimum-stability": "stable",
+  "license":           "Apache-2.0",
+  "authors":           [
+    {
+      "name":     "Daniel Carbone",
+      "email":    "daniel.p.carbone@gmail.com",
+      "homepage": "https://github.com/dcarbone"
+    }
+  ],
+  "require":           {
+    "php":             ">=7.4",
+    "ext-json": "*",
+    "dcarbone/gotime": "~v0.4"
+  },
+  "autoload":          {
+    "psr-4": {
+      "DCarbone\\Go\\JSON\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "@stable",
+    "friendsofphp/php-cs-fixer": "~v3.0"
+  },
+  "autoload-dev": {
+    "psr-4" : {
+      "DCarbone\\Go\\JSON\\": "src/",
+      "DCarbone\\Go\\JSON\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "php-cs-fixer": "vendor/bin/php-cs-fixer fix --rules @PSR12 src/"
+  }
+}
