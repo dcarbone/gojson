@@ -20,25 +20,36 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-use DCarbone\Go\Time;
-
 /**
  * Used to assist with marshalling types into json
- *
- * Trait Marshaller
  */
 trait Marshaller
 {
+    private static string $COLON_COLON_FIELDS = '::FIELDS';
+
     /**
+     * Convenience method to be called within a typical `jsonSerialize` method
+     *
      * @param int $flags
      * @return string
      */
-    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string {
-        $out = [];
+    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string
+    {
+        // stores final json-serializable representation
+        $output = [];
+        // check if class has any special field handling at all
+        $hasDefs = \defined(static::class . self::$COLON_COLON_FIELDS);
+        // iterate over each field present on class
         foreach ((array)$this as $field => $value) {
-            $this->marshalField($out, $field, $value);
+            // if this class has no special field handling at all or for this field, set
+            // as-is and move on
+            if (!$hasDefs || !isset(static::FIELDS[$field])) {
+                $output[$field] = $value;
+            } else {
+                $this->marshalField($output, $field, $value, static::FIELDS[$field]);
+            }
         }
-        return json_encode($out, $flags);
+        return json_encode($output, $flags);
     }
 
     /**
@@ -47,27 +58,29 @@ trait Marshaller
      * @param array $output
      * @param string $field
      * @param mixed $value
+     * @param array|null $def
      */
-    protected function marshalField(array &$output, string $field, $value): void
+    protected function marshalField(array &$output, string $field, mixed $value, ?array $def): void
     {
-        // if this field has no special handling, set as-is and move on.
-        if (!defined(static::class . '::FIELDS') || !isset(static::FIELDS[$field])) {
-            $output[$field] = $value;
+        // quick check to see if this field is skipped
+        if (isset($def[Field::MARSHAL_SKIP]) &&
+            true === $def[Field::MARSHAL_SKIP]) {
             return;
         }
 
-        // otherwise, get definition
-        $def = static::FIELDS[$field];
-
-        // if this field is marked as skipped, move on
-        if (isset($def[Transcoding::FIELD_MARSHAL_SKIP]) && true === $def[Transcoding::FIELD_MARSHAL_SKIP]) {
-            return;
-        }
+        // determined marshalled field name
+        $name = $def[Field::JSON_NAME] ?? $field;
 
         // if a marshal callback is defined, defer to that and move on.
-        if (isset($def[Transcoding::FIELD_MARSHAL_CALLBACK])) {
-            $cb = $def[Transcoding::FIELD_MARSHAL_CALLBACK];
-            if (false === \call_user_func($cb, $this, $field, $value)) {
+        if (isset($def[Field::MARSHAL_CALLBACK])) {
+            $cb = $def[Field::MARSHAL_CALLBACK];
+            // allow for using a class method for marshalled value
+            if (\is_string($cb) && \method_exists($this, $cb)) {
+                $output[$name] = $this->{$cb}($value);
+                return;
+            }
+            // handle all other callable output
+            if (false === \call_user_func($cb, $this, $field, $value, $name)) {
                 throw new \RuntimeException(
                     sprintf(
                         'Error calling marshal callback "%s" for field "%s" on class "%s"',
@@ -81,91 +94,27 @@ trait Marshaller
         }
 
         // if this field is marked as needing to be typecast to a specific type for output
-        if (isset($def[Transcoding::FIELD_MARSHAL_AS])) {
-            switch ($def[Transcoding::FIELD_MARSHAL_AS]) {
-                case Transcoding::STRING:
-                    $value = (string)$value;
-                    break;
-                case Transcoding::INTEGER:
-                    $value = (int)$value;
-                    break;
-                case Transcoding::DOUBLE:
-                    $value = (float)$value;
-                    break;
-                case Transcoding::BOOLEAN:
-                    $value = (bool)$value;
-                    break;
-
-                default:
-                    throw new \InvalidArgumentException(
-                        sprintf('Unable to handle serializing to %s', $def[Transcoding::FIELD_MARSHAL_AS])
-                    );
-            }
+        if (isset($def[Field::MARSHAL_AS])) {
+            $value = match ($def[Field::MARSHAL_AS]) {
+                Type::STRING => (string)$value,
+                Type::INTEGER => (int)$value,
+                Type::DOUBLE => (float)$value,
+                Type::BOOLEAN => (bool)$value,
+                default => throw new \InvalidArgumentException(
+                    sprintf('Unable to handle serializing to %s', $def[Field::MARSHAL_AS])
+                ),
+            };
         }
 
         // if this field is NOT explicitly marked as "omitempty", set and move on.
-        if (!isset($def[Transcoding::FIELD_OMITEMPTY]) || true !== $def[Transcoding::FIELD_OMITEMPTY]) {
-            $output[$field] = $value;
+        if (!isset($def[Field::OMITEMPTY]) || true !== $def[Field::OMITEMPTY]) {
+            $output[$name] = $value;
             return;
         }
 
-        // otherwise, handle value setting on a per-type basis
-
-        $type = \gettype($value);
-
-        if (Transcoding::STRING === $type) {
-            // strings must be non empty
-            if ('' !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::INTEGER === $type) {
-            // integers must be non-zero (negatives are ok)
-            if (0 !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::DOUBLE === $type) {
-            // floats must be non-zero (negatives are ok)
-            if (0.0 !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::BOOLEAN === $type) {
-            // bools must be true
-            if ($value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::OBJECT === $type) {
-            // object "non-zero" calculations require a bit more finesse...
-            if ($value instanceof \Countable) {
-                // countable types are non-empty if length > 0
-                if (0 < \count($value)) {
-                    $output[$field] = $value;
-                }
-            } elseif ($value instanceof Time\Duration) {
-                // Time\Duration types are non-zero if their internal value is > 0
-                if (0 < $value->Nanoseconds()) {
-                    $output[$field] = $value;
-                }
-            } elseif ($value instanceof Time\Time) {
-                // Time\Time values are non-zero if they are anything greater than epoch
-                if (!$value->IsZero()) {
-                    $output[$field] = $value;
-                }
-            } else {
-                // otherwise, by being defined it is non-zero, so add it.
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::ARRAY === $type) {
-            // arrays must have at least 1 value
-            if ([] !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::RESOURCE === $type) {
-            // todo: be more better about resources
-            $output[$field] = $value;
-            return;
+        // otherwise, determine whether value equates to 'zero' before setting
+        if (!Zero::isZero($value)) {
+            $output[$name] = $value;
         }
-
-        // once we get here the only possible value type is "NULL", which are always considered "empty".  thus, do not
-        // set any value.
     }
 }

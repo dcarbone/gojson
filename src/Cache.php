@@ -1,6 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace DCarbone\Go\JSON\Tests\Types;
+declare(strict_types=1);
+
+namespace DCarbone\Go\JSON;
 
 /*
    Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
@@ -18,27 +20,7 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
-use DCarbone\Go\JSON\Field;
-use DCarbone\Go\JSON\Marshaller;
-use DCarbone\Go\JSON\Type;
-use DCarbone\Go\JSON\Unmarshaller;
-use DCarbone\Go\JSON\Zero;
-
-class TestIntegerField
+final class Cache
 {
-    use Marshaller;
-    use Unmarshaller;
 
-    protected const FIELDS = [
-        'var' => [
-            Field::TYPE => Type::INTEGER,
-        ],
-    ];
-
-    public int $var;
-
-    public function __construct(int $var = Zero::INTEGER)
-    {
-        $this->var = $var;
-    }
 }

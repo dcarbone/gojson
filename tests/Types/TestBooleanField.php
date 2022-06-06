@@ -18,9 +18,11 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
+use DCarbone\Go\JSON\Field;
 use DCarbone\Go\JSON\Marshaller;
-use DCarbone\Go\JSON\Transcoding;
+use DCarbone\Go\JSON\Type;
 use DCarbone\Go\JSON\Unmarshaller;
+use DCarbone\Go\JSON\Zero;
 
 class TestBooleanField
 {
@@ -29,9 +31,17 @@ class TestBooleanField
 
     protected const FIELDS = [
         'var' => [
-            Transcoding::FIELD_TYPE => Transcoding::BOOLEAN,
+            Field::TYPE => Type::BOOLEAN,
         ],
     ];
 
     public bool $var;
+
+    /**
+     * @param bool $var
+     */
+    public function __construct(bool $var = Zero::BOOLEAN)
+    {
+        $this->var = $var;
+    }
 }

@@ -26,41 +26,45 @@ use PHPUnit\Framework\TestCase;
 
 class MarshallerTests extends TestCase
 {
+    /**
+     * @covers Marshaller::MarshalJSON
+     * @return void
+     */
     public function testMarshalFields()
     {
         $TESTS = [
             'string-field'  => [
-                'inst'     => TestStringField::UnmarshalJSON('{"var":"value"}'),
-                'expected' => [
-                    'json' => '{"var":"value"}',
+                instanceT     => new TestStringField('value'),
+                expectedT => [
+                    jsonT => '{"var":"value"}',
                 ],
             ],
             'integer-field' => [
-                'inst'     => TestIntegerField::UnmarshalJSON('{"var":1}'),
-                'expected' => [
-                    'json' => '{"var":1}',
+                instanceT     => new TestIntegerField(1),
+                expectedT => [
+                    jsonT => '{"var":1}',
                 ],
             ],
             'double-field'  => [
-                'inst'     => TestDoubleField::UnmarshalJSON('{"var":1.1}'),
-                'expected' => [
-                    'json' => '{"var":1.1}',
+                instanceT     => new TestDoubleField(1.1),
+                expectedT => [
+                    jsonT => '{"var":1.1}',
                 ],
             ],
             'boolean-field' => [
-                'inst'     => TestBooleanField::UnmarshalJSON('{"var":true}'),
-                'expected' => [
-                    'json' => '{"var":true}',
+                instanceT     => new TestBooleanField(true),
+                expectedT => [
+                    jsonT => '{"var":true}',
                 ],
             ],
         ];
 
         foreach ($TESTS as $name => $test) {
-            $this->assertIsObject($test['inst']);
-            $json = $test['inst']->MarshalJSON();
+            $this->assertIsObject($test[instanceT]);
+            $json = $test[instanceT]->MarshalJSON();
             $this->assertIsString($json);
             $this->assertJson($json);
-            $this->assertJsonStringEqualsJsonString($json, $test['expected']['json']);
+            $this->assertJsonStringEqualsJsonString($json, $test[expectedT][jsonT]);
         }
     }
 }

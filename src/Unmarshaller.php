@@ -22,11 +22,15 @@ namespace DCarbone\Go\JSON;
 
 /**
  * Used to assist with unmarshalling json responses
- *
- * Trait Unmarshaller
  */
 trait Unmarshaller
 {
+    /** @var \ReflectionClass */
+    private static \ReflectionClass $reflClass;
+
+    /** @var string */
+    private static string $COLON_COLON_FIELDS = '::FIELDS';
+
     /**
      * @param string|null $json
      * @return static
@@ -45,41 +49,53 @@ trait Unmarshaller
                 )
             );
         }
+
+        // initialize new instance of containing class
         $inst = new static();
-        foreach ($decoded as $field => $value) {
-            $inst->unmarshalField($field, $value);
+
+        // check once if implementing class has special field handling
+        $hasDefs = \defined($inst::class . self::$COLON_COLON_FIELDS);
+
+        // construct map of marshalled names => field names
+        $fieldNameMap = $hasDefs ? $inst->fieldNameMap($inst::FIELDS) : [];
+
+        // iterate over all keys present in decoded json
+        foreach ($decoded as $name => $value) {
+            // determine if field is marshalled as something else
+            $field = $fieldNameMap[$name] ?? $name;
+
+            // considered "complex" if:
+            //  1. has defs
+            //  2. has def for this field
+            //  3. def is more than rename
+            if ($hasDefs &&
+                isset($inst::FIELDS[$field]) &&
+                (1 < \count($inst::FIELDS[$field]) || !isset($inst::FIELDS[$field][Field::JSON_NAME]))) {
+                $inst->unmarshalComplex($field, $value, $inst::FIELDS[$field]);
+            } elseif (!\property_exists($inst, $field)) {
+                // if the property does not exist on the object, do not unmarshall it
+                continue;
+            } else {
+                // if we get to here, just set it
+                $inst->{$field} = $value;
+            }
         }
         return $inst;
     }
 
     /**
-     * Attempts to unmarshal the provided value into the provided field on the implementing class
-     *
-     * @param string $field
-     * @param mixed $value
+     * @param array $defs
+     * @return array
      */
-    protected function unmarshalField(string $field, $value): void
+    protected function fieldNameMap(array $defs): array
     {
-        if (defined(static::class . '::FIELDS') && isset(static::FIELDS[$field])) {
-            // if the implementing class has some explicitly defined overrides
-            $this->unmarshalComplex($field, $value, static::FIELDS[$field]);
-        } elseif (!property_exists($this, $field)) {
-            // if the field isn't explicitly defined on the implementing class, just set it to whatever the incoming
-            // value is
-            $this->{$field} = $value;
-        } /** @noinspection PhpStatementHasEmptyBodyInspection */ elseif (null === $value) {
-            // if the value is null at this point, ignore and move on.
-            // note: this is not checked prior to the property_exists call as if the field is not explicitly defined but
-            // is seen with a null value, we still want to define it as null on the implementing type.
-        } elseif (isset($this->{$field}) && is_scalar($this->{$field})) {
-            // if the property has a scalar default value, unmarshal it as such.
-            $this->unmarshalScalar($field, $value, false);
-        } else {
-            // if we fall down here, try to set the value as-is.  if this barfs, it indicates we have a bug to be
-            // squished.
-            // todo: should this be an exception?
-            $this->{$field} = $value;
+        $nameMap = [];
+        foreach ($defs as $field => $def) {
+            if (isset($def[Field::JSON_NAME])) {
+                $nameMap[$def[Field::JSON_NAME]] = $field;
+            }
         }
+        return $nameMap;
     }
 
     /**
@@ -88,27 +104,7 @@ trait Unmarshaller
      */
     protected function fieldIsNullable(array $fieldDef): bool
     {
-        // todo: make sure this key is always a bool...
-        return $fieldDef[Transcoding::FIELD_NULLABLE] ?? false;
-    }
-
-    /**
-     * @param string $type
-     * @return bool|float|int|string|null
-     */
-    protected static function scalarZeroVal(string $type)
-    {
-        if (Transcoding::STRING === $type) {
-            return Transcoding::ZERO_STRING;
-        } elseif (Transcoding::INTEGER === $type) {
-            return Transcoding::ZERO_INTEGER;
-        } elseif (Transcoding::DOUBLE === $type) {
-            return Transcoding::ZERO_DOUBLE;
-        } elseif (Transcoding::BOOLEAN === $type) {
-            return Transcoding::ZERO_BOOLEAN;
-        } else {
-            return null;
-        }
+        return $fieldDef[Field::NULLABLE] ?? false;
     }
 
     /**
@@ -116,41 +112,32 @@ trait Unmarshaller
      * @param mixed $value
      * @param string $type
      * @param bool $nullable
-     * @return bool|float|int|string
+     * @return bool|float|int|string|null
      */
-    private function buildScalarValue(string $field, $value, string $type, bool $nullable)
-    {
+    private function buildScalarValue(
+        string $field,
+        mixed $value,
+        string $type,
+        bool $nullable
+    ): bool|float|int|string|null {
         // if the incoming value is null...
         if (null === $value) {
-            // ...and this field is nullable, just return null
-            if ($nullable) {
-                return null;
-            } else {
-                // otherwise, return zero val for this type
-                return self::scalarZeroVal($type);
-            }
-        } elseif (Transcoding::STRING === $type) {
-            return (string)$value;
-        } elseif (Transcoding::INTEGER === $type) {
-            return \intval($value, 10);
-        } elseif (Transcoding::DOUBLE === $type) {
-            return (float)$value;
-        } elseif (Transcoding::BOOLEAN === $type) {
-            return (bool)$value;
+            return $nullable ? null : Zero::forType($type);
         } else {
-            // if we fall down to here, default to try to set the value to whatever it happens to be.
             return $value;
         }
     }
 
     /**
+     * TODO: allow for alternative construction methods
+     *
      * @param string $field
      * @param array|object $value
      * @param string $class
      * @param bool $nullable
      * @return object|null
      */
-    private function buildObjectValue(string $field, $value, string $class, bool $nullable): ?object
+    private function buildObjectValue(string $field, mixed $value, string $class, bool $nullable): ?object
     {
         // if the incoming value is null...
         if (null === $value) {
@@ -176,12 +163,12 @@ trait Unmarshaller
      * @param mixed $value
      * @param bool $nullable
      */
-    private function unmarshalScalar(string $field, $value, bool $nullable): void
+    private function unmarshalScalar(string $field, mixed $value, bool $nullable): void
     {
         $this->{$field} = $this->buildScalarValue(
             $field,
             $value,
-            isset($this->{$field}) ? \gettype($this->{$field}) : Transcoding::MIXED,
+            isset($this->{$field}) ? \gettype($this->{$field}) : Type::MIXED,
             $nullable
         );
     }
@@ -191,9 +178,10 @@ trait Unmarshaller
      * @param mixed $value
      * @param array $def
      */
-    private function unmarshalObject(string $field, $value, array $def): void
+    private function unmarshalObject(string $field, mixed $value, array $def): void
     {
-        if (!isset($def[Transcoding::FIELD_CLASS])) {
+        // if class is not defined, die here
+        if (!isset($def[Field::CLASSNAME])) {
             throw new \LogicException(
                 sprintf(
                     'Field "%s" on type "%s" is missing FIELD_CLASS hydration entry: %s',
@@ -207,7 +195,7 @@ trait Unmarshaller
         $this->{$field} = $this->buildObjectValue(
             $field,
             $value,
-            $def[Transcoding::FIELD_CLASS],
+            $def[Field::CLASSNAME],
             self::fieldIsNullable($def)
         );
     }
@@ -217,14 +205,14 @@ trait Unmarshaller
      * @param mixed $value
      * @param array $def
      */
-    private function unmarshalArray(string $field, $value, array $def): void
+    private function unmarshalArray(string $field, mixed $value, array $def): void
     {
         // attempt to extract the two possible keys
-        $type = $def[Transcoding::FIELD_ARRAY_TYPE] ?? null;
-        $class = $def[Transcoding::FIELD_CLASS] ?? null;
+        $arrType = $def[Field::ARRAY_TYPE] ?? null;
+        $arrClass = $def[Field::CLASSNAME] ?? null;
 
         // type is required
-        if (null === $type) {
+        if (null === $arrType) {
             throw new \DomainException(
                 sprintf(
                     'Field "%s" on type "%s" definition is missing FIELD_ARRAY_TYPE value: %s',
@@ -259,8 +247,8 @@ trait Unmarshaller
         // currently, the only supported array types are scalar or objects.  everything else will require
         // a custom callback for hydration purposes.
 
-        if (Transcoding::OBJECT === $type) {
-            if (null === $class) {
+        if (Type::OBJECT === $arrType) {
+            if (null === $arrClass) {
                 throw new \DomainException(
                     sprintf(
                         'Field "%s" on type "%s" definition is missing FIELD_CLASS value: %s',
@@ -279,7 +267,7 @@ trait Unmarshaller
                     $this->{$field}[$k] = $this->buildObjectValue(
                         $field,
                         $v,
-                        $class,
+                        $arrClass,
                         false
                     );
                 }
@@ -290,7 +278,7 @@ trait Unmarshaller
                 if (null === $v) {
                     $this->{$field}[$k] = null;
                 } else {
-                    $this->{$field}[$k] = $this->buildScalarValue($field, $v, $type, false);
+                    $this->{$field}[$k] = $this->buildScalarValue($field, $v, $arrType, false);
                 }
             }
         }
@@ -303,13 +291,13 @@ trait Unmarshaller
      * @param mixed $value
      * @param array $def
      */
-    private function unmarshalComplex(string $field, $value, array $def): void
+    private function unmarshalComplex(string $field, mixed $value, array $def): void
     {
-        // check if a callable has been defined
-        if (isset($def[Transcoding::FIELD_UNMARSHAL_CALLBACK])) {
-            $cb = $def[Transcoding::FIELD_UNMARSHAL_CALLBACK];
+        // if an unmarshal callback is defined, defer to that and move on.
+        if (isset($def[Field::UNMARSHAL_CALLBACK])) {
+            $cb = $def[Field::UNMARSHAL_CALLBACK];
             // allow for using a "setter" method
-            if (\is_string($cb) && method_exists($this, $cb)) {
+            if (\is_string($cb) && \method_exists($this, $cb)) {
                 $this->{$cb}($value);
                 return;
             }
@@ -327,17 +315,18 @@ trait Unmarshaller
             return;
         }
 
-        // try to determine field type by first looking up the field in the definition map, then by inspecting the
+        // try to determine field type by first looking up the field in the definition map, then by inspecting
         // the field's default value.
         //
         // objects _must_ have an entry in the map, as they are either un-initialized at class instantiation time or
         // set to "NULL", at which point we cannot automatically determine the value type.
 
-        if (isset($def[Transcoding::FIELD_TYPE])) {
+        if (isset($def[Field::TYPE])) {
             // if the field has a FIELD_TYPE value in the definition map
-            $fieldType = $def[Transcoding::FIELD_TYPE];
+            $fieldType = $def[Field::TYPE];
         } elseif (isset($this->{$field})) {
             // if the field is set and non-null
+            // todo: should this be made more clever?  perhaps reflect our way to success?
             $fieldType = \gettype($this->{$field});
         } else {
             throw new \LogicException(
@@ -350,9 +339,9 @@ trait Unmarshaller
             );
         }
 
-        if (Transcoding::OBJECT === $fieldType) {
+        if (Type::OBJECT === $fieldType) {
             $this->unmarshalObject($field, $value, $def);
-        } elseif (Transcoding::ARRAY === $fieldType) {
+        } elseif (Type::ARRAY === $fieldType) {
             $this->unmarshalArray($field, $value, $def);
         } else {
             // at this point, assume scalar

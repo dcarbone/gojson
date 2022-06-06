@@ -18,9 +18,11 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
+use DCarbone\Go\JSON\Field;
 use DCarbone\Go\JSON\Marshaller;
-use DCarbone\Go\JSON\Transcoding;
+use DCarbone\Go\JSON\Type;
 use DCarbone\Go\JSON\Unmarshaller;
+use DCarbone\Go\JSON\Zero;
 
 class TestStringField
 {
@@ -29,9 +31,14 @@ class TestStringField
 
     protected const FIELDS = [
         'var' => [
-            Transcoding::FIELD_TYPE => Transcoding::STRING,
+            Field::TYPE => Type::STRING,
         ],
     ];
 
     public string $var;
+
+    public function __construct(string $var = Zero::STRING)
+    {
+        $this->var = $var;
+    }
 }

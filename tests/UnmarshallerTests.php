@@ -22,87 +22,79 @@ use DCarbone\Go\JSON\Tests\Types\TestBooleanField;
 use DCarbone\Go\JSON\Tests\Types\TestDoubleField;
 use DCarbone\Go\JSON\Tests\Types\TestIntegerField;
 use DCarbone\Go\JSON\Tests\Types\TestStringField;
-use DCarbone\Go\JSON\Transcoding;
+use DCarbone\Go\JSON\Type;
 use PHPUnit\Framework\TestCase;
 
 class UnmarshallerTests extends TestCase
 {
     private const TESTS = [
-        'string-field' => [
-            'class'    => TestStringField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": "value"}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::STRING,
-                'value' => 'value',
+        'string-field'  => [
+            classT    => TestStringField::class,
+            jsonT     => '{"var": "value"}',
+            expectedT => [
+                fieldT => varT,
+                typeT  => Type::STRING,
+                valueT => valueT,
             ],
         ],
         'integer-field' => [
-            'class'    => TestIntegerField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": 1}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::INTEGER,
-                'value' => 1,
+            classT    => TestIntegerField::class,
+            jsonT     => '{"var": 1}',
+            expectedT => [
+                fieldT => varT,
+                typeT  => Type::INTEGER,
+                valueT => 1,
             ],
         ],
-        'double-field' => [
-            'class'    => TestDoubleField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": 1.1}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::DOUBLE,
-                'value' => 1.1,
+        'double-field'  => [
+            classT    => TestDoubleField::class,
+            jsonT     => '{"var": 1.1}',
+            expectedT => [
+                fieldT => varT,
+                typeT  => Type::DOUBLE,
+                valueT => 1.1,
             ],
         ],
         'boolean-field' => [
-            'class'    => TestBooleanField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": true}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::BOOLEAN,
-                'value' => true,
+            classT    => TestBooleanField::class,
+            jsonT     => '{"var": true}',
+            expectedT => [
+                fieldT => varT,
+                typeT  => Type::BOOLEAN,
+                valueT => true,
             ],
         ],
     ];
 
+    /**
+     * @covers Unmarshaller::UnmarshalJSON
+     * @return void
+     */
     public function testUnmarshalFields()
     {
         foreach (self::TESTS as $name => $test) {
-            $inst = $test['class']::UnmarshalJSON($test['json']);
-            $this->assertInstanceOf($test['class'], $inst);
-            $this->assertObjectHasAttribute($test['expected']['field'], $inst);
-            $fieldValue = $inst->{$test['expected']['field']};
-            switch ($test['expected']['type']) {
-                case Transcoding::STRING:
+            $inst = $test[classT]::UnmarshalJSON($test[jsonT]);
+            $this->assertInstanceOf($test[classT], $inst);
+            $this->assertObjectHasAttribute($test[expectedT][fieldT], $inst);
+            $fieldValue = $inst->{$test[expectedT][fieldT]};
+            switch ($test[expectedT][typeT]) {
+                case Type::STRING:
                     $this->assertIsString($fieldValue);
                     break;
-                case Transcoding::INTEGER:
+                case Type::INTEGER:
                     $this->assertIsInt($fieldValue);
                     break;
-                case Transcoding::DOUBLE:
+                case Type::DOUBLE:
                     $this->assertIsFloat($fieldValue);
                     break;
-                case Transcoding::BOOLEAN:
+                case Type::BOOLEAN:
                     $this->assertIsBool($fieldValue);
                     break;
-                case Transcoding::OBJECT:
+                case Type::OBJECT:
                     $this->assertIsObject($fieldValue);
-                    $this->assertInstanceOf($test['expected']['field_class'], $fieldValue);
+                    $this->assertInstanceOf($test[expectedT][fieldClassT], $fieldValue);
                     break;
-                case Transcoding::ARRAY:
+                case Type::ARRAY:
                     $this->assertIsArray($fieldValue);
                     break;
 
@@ -114,6 +106,7 @@ EOT,
                         )
                     );
             }
+            $this->assertEquals($test[expectedT][valueT], $fieldValue);
         }
     }
 }
