@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DCarbone\Go\JSON\Tests;
 
@@ -24,7 +26,7 @@ use DCarbone\Go\JSON\Tests\Types\TestIntegerField;
 use DCarbone\Go\JSON\Tests\Types\TestStringField;
 use PHPUnit\Framework\TestCase;
 
-class MarshallerTests extends TestCase
+class MarshallerTest extends TestCase
 {
     public function testMarshalFields()
     {

@@ -1,0 +1,6 @@
+{
+  "require" : {
+    "friendsofphp/php-cs-fixer": "~v3.0",
+    "adamwojs/php-cs-fixer-phpdoc-force-fqcn": "dev-master"
+  }
+}

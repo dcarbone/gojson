@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DCarbone\Go\JSON\Tests\Types;
+namespace DCarbone\Go\JSON;
 
 /*
    Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
@@ -20,20 +20,18 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
-use DCarbone\Go\JSON\Marshaller;
-use DCarbone\Go\JSON\Transcoding;
-use DCarbone\Go\JSON\Unmarshaller;
-
-class TestStringField
+final class Type
 {
-    use Marshaller;
-    use Unmarshaller;
+    public const STRING   = 'string';
+    public const INTEGER  = 'integer';
+    public const DOUBLE   = 'double';
+    public const FLOAT    = self::DOUBLE;
+    public const BOOLEAN  = 'boolean';
+    public const OBJECT   = 'object';
+    public const ARRAY    = 'array';
+    public const RESOURCE = 'resource';
+    public const MIXED    = 'mixed';
+    public const NULL     = 'NULL';
 
-    protected const FIELDS = [
-        'var' => [
-            Transcoding::FIELD_TYPE => Transcoding::STRING,
-        ],
-    ];
-
-    public string $var;
+    public const SCALAR = [self::STRING, self::INTEGER, self::DOUBLE, self::BOOLEAN];
 }

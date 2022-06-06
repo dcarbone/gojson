@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DCarbone\Go\JSON\Tests;
 
@@ -25,7 +27,7 @@ use DCarbone\Go\JSON\Tests\Types\TestStringField;
 use DCarbone\Go\JSON\Transcoding;
 use PHPUnit\Framework\TestCase;
 
-class UnmarshallerTests extends TestCase
+class UnmarshallerTest extends TestCase
 {
     private const TESTS = [
         'string-field' => [

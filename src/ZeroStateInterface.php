@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DCarbone\Go\JSON\Tests\Types;
+namespace DCarbone\Go\JSON;
 
 /*
    Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
@@ -20,20 +20,13 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
-use DCarbone\Go\JSON\Marshaller;
-use DCarbone\Go\JSON\Transcoding;
-use DCarbone\Go\JSON\Unmarshaller;
-
-class TestStringField
+interface ZeroStateInterface
 {
-    use Marshaller;
-    use Unmarshaller;
-
-    protected const FIELDS = [
-        'var' => [
-            Transcoding::FIELD_TYPE => Transcoding::STRING,
-        ],
-    ];
-
-    public string $var;
+    /**
+     * Must return true if provided value is considered "zero"
+     *
+     * @param object $value
+     * @return bool
+     */
+    public function isZero(object $value): bool;
 }

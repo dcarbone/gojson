@@ -1,0 +1,46 @@
+name: "Tests"
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+  push:
+    branches:
+      - master
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
+      - '.github/workflows/tests.yaml'
+
+env:
+  CONSUL_HTTP_ADDR: "127.0.0.1:8500"
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php-version: ["7.4", "8.0", "8.1"]
+
+    name: Tests - PHP ${{ matrix.php-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: json
+      - run: |
+          composer update \
+            --no-ansi \
+            --no-interaction \
+            --no-scripts \
+            --no-progress
+      - run: |
+          ./vendor/bin/phpunit -c phpunit.xml

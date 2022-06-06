@@ -220,7 +220,7 @@ trait Unmarshaller
     private function unmarshalArray(string $field, $value, array $def): void
     {
         // attempt to extract the two possible keys
-        $type = $def[Transcoding::FIELD_ARRAY_TYPE] ?? null;
+        $type  = $def[Transcoding::FIELD_ARRAY_TYPE] ?? null;
         $class = $def[Transcoding::FIELD_CLASS] ?? null;
 
         // type is required

@@ -20,8 +20,6 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-use DCarbone\Go\Time;
-
 /**
  * Used to assist with marshalling types into json
  *
@@ -33,7 +31,8 @@ trait Marshaller
      * @param int $flags
      * @return string
      */
-    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string {
+    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string
+    {
         $out = [];
         foreach ((array)$this as $field => $value) {
             $this->marshalField($out, $field, $value);
@@ -113,59 +112,8 @@ trait Marshaller
 
         $type = \gettype($value);
 
-        if (Transcoding::STRING === $type) {
-            // strings must be non empty
-            if ('' !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::INTEGER === $type) {
-            // integers must be non-zero (negatives are ok)
-            if (0 !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::DOUBLE === $type) {
-            // floats must be non-zero (negatives are ok)
-            if (0.0 !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::BOOLEAN === $type) {
-            // bools must be true
-            if ($value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::OBJECT === $type) {
-            // object "non-zero" calculations require a bit more finesse...
-            if ($value instanceof \Countable) {
-                // countable types are non-empty if length > 0
-                if (0 < \count($value)) {
-                    $output[$field] = $value;
-                }
-            } elseif ($value instanceof Time\Duration) {
-                // Time\Duration types are non-zero if their internal value is > 0
-                if (0 < $value->Nanoseconds()) {
-                    $output[$field] = $value;
-                }
-            } elseif ($value instanceof Time\Time) {
-                // Time\Time values are non-zero if they are anything greater than epoch
-                if (!$value->IsZero()) {
-                    $output[$field] = $value;
-                }
-            } else {
-                // otherwise, by being defined it is non-zero, so add it.
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::ARRAY === $type) {
-            // arrays must have at least 1 value
-            if ([] !== $value) {
-                $output[$field] = $value;
-            }
-        } elseif (Transcoding::RESOURCE === $type) {
-            // todo: be more better about resources
+        if (!Zero::isZero($value)) {
             $output[$field] = $value;
-            return;
         }
-
-        // once we get here the only possible value type is "NULL", which are always considered "empty".  thus, do not
-        // set any value.
     }
 }
