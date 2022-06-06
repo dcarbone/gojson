@@ -40,11 +40,11 @@ class Zero
     public static function forType(string $type): bool|float|int|string|null
     {
         return match ($type) {
-            Type::STRING => Zero::STRING,
+            Type::STRING  => Zero::STRING,
             Type::INTEGER => Zero::INTEGER,
-            Type::DOUBLE => Zero::DOUBLE,
+            Type::DOUBLE  => Zero::DOUBLE,
             Type::BOOLEAN => Zero::BOOLEAN,
-            default => null,
+            default       => null,
         };
     }
 

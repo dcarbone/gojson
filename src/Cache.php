@@ -22,5 +22,4 @@ namespace DCarbone\Go\JSON;
 
 final class Cache
 {
-
 }

@@ -208,7 +208,7 @@ trait Unmarshaller
     private function unmarshalArray(string $field, mixed $value, array $def): void
     {
         // attempt to extract the two possible keys
-        $arrType = $def[Field::ARRAY_TYPE] ?? null;
+        $arrType  = $def[Field::ARRAY_TYPE] ?? null;
         $arrClass = $def[Field::CLASSNAME] ?? null;
 
         // type is required

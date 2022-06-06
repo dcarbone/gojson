@@ -96,11 +96,11 @@ trait Marshaller
         // if this field is marked as needing to be typecast to a specific type for output
         if (isset($def[Field::MARSHAL_AS])) {
             $value = match ($def[Field::MARSHAL_AS]) {
-                Type::STRING => (string)$value,
+                Type::STRING  => (string)$value,
                 Type::INTEGER => (int)$value,
-                Type::DOUBLE => (float)$value,
+                Type::DOUBLE  => (float)$value,
                 Type::BOOLEAN => (bool)$value,
-                default => throw new \InvalidArgumentException(
+                default       => throw new \InvalidArgumentException(
                     sprintf('Unable to handle serializing to %s', $def[Field::MARSHAL_AS])
                 ),
             };

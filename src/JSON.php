@@ -263,7 +263,7 @@ class JSON
 
             case 'string':
                 // STRINGS ARE EXPECTED TO BE IN ASCII OR UTF-8 FORMAT
-                $ascii = '';
+                $ascii      = '';
                 $strlen_var = strlen($var);
 
                 /*
@@ -537,14 +537,14 @@ class JSON
                         : (float)$str;
                 } elseif (preg_match('/^("|\').*(\1)$/s', $str, $m) && $m[1] == $m[2]) {
                     // STRINGS RETURNED IN UTF-8 FORMAT
-                    $delim = substr($str, 0, 1);
-                    $chrs = substr($str, 1, -1);
-                    $utf8 = '';
+                    $delim       = substr($str, 0, 1);
+                    $chrs        = substr($str, 1, -1);
+                    $utf8        = '';
                     $strlen_chrs = strlen($chrs);
 
                     for ($c = 0; $c < $strlen_chrs; ++$c) {
                         $substr_chrs_c_2 = substr($chrs, $c, 2);
-                        $ord_chrs_c = ord($chrs[$c]);
+                        $ord_chrs_c      = ord($chrs[$c]);
 
                         switch (true) {
                             case $substr_chrs_c_2 == '\b':
@@ -664,7 +664,7 @@ class JSON
                     $strlen_chrs = strlen($chrs);
 
                     for ($c = 0; $c <= $strlen_chrs; ++$c) {
-                        $top = end($stk);
+                        $top             = end($stk);
                         $substr_chrs_c_2 = substr($chrs, $c, 2);
 
                         if (($c == $strlen_chrs) || (($chrs[$c] == ',') && ($top['what'] == SERVICES_JSON_SLICE))) {

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DCarbone\Go\JSON\Tests;
 
@@ -35,25 +37,25 @@ class MarshallerTests extends TestCase
         $TESTS = [
             'string-field'  => [
                 instanceT     => new TestStringField('value'),
-                expectedT => [
+                expectedT     => [
                     jsonT => '{"var":"value"}',
                 ],
             ],
             'integer-field' => [
                 instanceT     => new TestIntegerField(1),
-                expectedT => [
+                expectedT     => [
                     jsonT => '{"var":1}',
                 ],
             ],
             'double-field'  => [
                 instanceT     => new TestDoubleField(1.1),
-                expectedT => [
+                expectedT     => [
                     jsonT => '{"var":1.1}',
                 ],
             ],
             'boolean-field' => [
                 instanceT     => new TestBooleanField(true),
-                expectedT => [
+                expectedT     => [
                     jsonT => '{"var":true}',
                 ],
             ],

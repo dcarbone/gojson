@@ -31,7 +31,6 @@ trait Meta
     protected function getField(string $fieldName): ?Field
     {
         if (!isset(self::$_gojsonFields[$fieldName])) {
-
         }
     }
 }

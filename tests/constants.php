@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DCarbone\Go\JSON\Tests;
 
@@ -18,12 +20,12 @@ namespace DCarbone\Go\JSON\Tests;
    limitations under the License.
  */
 
-const classT = 'class';
-const expectedT = 'expected';
-const fieldT = 'field';
+const classT      = 'class';
+const expectedT   = 'expected';
+const fieldT      = 'field';
 const fieldClassT = 'field_class';
-const instanceT = 'instance';
-const jsonT = 'json';
-const typeT = 'type';
-const valueT = 'value';
-const varT = 'var';
+const instanceT   = 'instance';
+const jsonT       = 'json';
+const typeT       = 'type';
+const valueT      = 'value';
+const varT        = 'var';
