@@ -60,11 +60,10 @@ trait Marshaller
      * @param mixed $value
      * @param array|null $def
      */
-    protected function marshalField(array &$output, string $field, mixed $value, ?array $def): void
+    protected function marshalField(array &$output, string $field, $value, ?array $def): void
     {
         // quick check to see if this field is skipped
-        if (isset($def[Field::MARSHAL_SKIP]) &&
-            true === $def[Field::MARSHAL_SKIP]) {
+        if (isset($def[Field::MARSHAL_SKIP]) && true === $def[Field::MARSHAL_SKIP]) {
             return;
         }
 
@@ -91,19 +90,6 @@ trait Marshaller
                 );
             }
             return;
-        }
-
-        // if this field is marked as needing to be typecast to a specific type for output
-        if (isset($def[Field::MARSHAL_AS])) {
-            $value = match ($def[Field::MARSHAL_AS]) {
-                Type::STRING  => (string)$value,
-                Type::INTEGER => (int)$value,
-                Type::DOUBLE  => (float)$value,
-                Type::BOOLEAN => (bool)$value,
-                default       => throw new \InvalidArgumentException(
-                    sprintf('Unable to handle serializing to %s', $def[Field::MARSHAL_AS])
-                ),
-            };
         }
 
         // if this field is NOT explicitly marked as "omitempty", set and move on.
