@@ -1,5 +1,8 @@
+/.github export-ignore
 /tests export-ignore
+/tools export-ignore
 /.gitignore export-ignore
 /.gitattributes export-ignore
+/Makefile export-ignore
 /phpunit.xml export-ignore
 /README.md export-ignore
