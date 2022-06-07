@@ -25,18 +25,25 @@ namespace DCarbone\Go\JSON;
  *
  * Trait Unmarshaller
  */
-trait Unmarshaller
+trait UnmarshalJSON
 {
     /**
      * @param string|null $json
+     * @param int $jsonDecodeFlags
      * @return static
+     * @throws \ReflectionException
      */
-    public static function UnmarshalJSON(?string $json): object
+    public static function UnmarshalJSON(?string $json, int $jsonDecodeFlags = 0): object
     {
+        // if null is provided, return zero val of class
         if (null === $json) {
+            $zs = Zero::$zeroStates->getClass(static::class);
+            if (null !== $zs) {
+                return $zs->zeroVal();
+            }
             return new static();
         }
-        $decoded = json_decode($json, true);
+        $decoded = json_decode($json, true, 512, $jsonDecodeFlags);
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new \RuntimeException(
                 sprintf(
@@ -45,7 +52,28 @@ trait Unmarshaller
                 )
             );
         }
-        $inst = new static();
+        return static::hydrate($decoded);
+    }
+
+    /**
+     * @param array $decoded
+     * @return object
+     * @throws \ReflectionException
+     */
+    public static function UnmarshalJSONDecoded(array $decoded): object
+    {
+        return static::hydrate($decoded);
+    }
+
+    /**
+     * @param array $decoded
+     * @return object
+     * @throws \ReflectionException
+     */
+    protected static function hydrate(array $decoded): object
+    {
+        $rc   = new \ReflectionClass(static::class);
+        $inst = $rc->newInstanceWithoutConstructor();
         foreach ($decoded as $field => $value) {
             $inst->unmarshalField($field, $value);
         }
@@ -138,14 +166,20 @@ trait Unmarshaller
             // ...and this field is nullable, return null
             if ($nullable) {
                 return null;
-            } else {
-                // ... and this field must be an instance of the provided class, return empty new empty instance
-                return new $class([]);
             }
-        } elseif ($value instanceof $class) {
-            // if the incoming value is already an instance of the class, clone it and return
-            return clone $value;
+            // otherwise, check if class is registered with a custom zero state
+            $zs = Zero::$zeroStates->getClass($class);
+            if (null !== $zs) {
+                return $zs->zeroVal();
+            }
+            // otherwise, attempt to construct.
+            // note, this will fail if the class's constructor has required parameters.  in these situations,
+            // use either a custom unmarshaller func or register a custom zero val state
+            return new $class();
+        } elseif (method_exists($class, 'UnmarshalJSONDecoded')) {
+            return $class::UnmarshalJSONDecoded((array)$value);
         } else {
+
             return new $class((array)$value);
         }
     }

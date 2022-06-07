@@ -20,15 +20,17 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
-use DCarbone\Go\JSON\Marshaller;
+use DCarbone\Go\JSON\JSONMarshalable;
+use DCarbone\Go\JSON\JSONUnmarshalable;
+use DCarbone\Go\JSON\MarshalJSON;
 use DCarbone\Go\JSON\Transcoding;
 use DCarbone\Go\JSON\Type;
-use DCarbone\Go\JSON\Unmarshaller;
+use DCarbone\Go\JSON\UnmarshalJSON;
 
-final class TestStringField
+final class TestStringField implements JSONUnmarshalable, JSONMarshalable
 {
-    use Marshaller;
-    use Unmarshaller;
+    use MarshalJSON;
+    use UnmarshalJSON;
     use SimpleVarComparatorTrait;
 
     protected const FIELDS = [

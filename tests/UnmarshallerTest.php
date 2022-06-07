@@ -24,7 +24,9 @@ use DCarbone\Go\JSON\Tests\Types\TestArrayStringField;
 use DCarbone\Go\JSON\Tests\Types\TestBooleanField;
 use DCarbone\Go\JSON\Tests\Types\TestDoubleField;
 use DCarbone\Go\JSON\Tests\Types\TestIntegerField;
+use DCarbone\Go\JSON\Tests\Types\TestObjectField;
 use DCarbone\Go\JSON\Tests\Types\TestStringField;
+use DCarbone\Go\JSON\Tests\Types\varClass;
 use PHPUnit\Framework\TestCase;
 
 class UnmarshallerTest extends TestCase
@@ -33,7 +35,18 @@ class UnmarshallerTest extends TestCase
     {
         $inst = $class::UnmarshalJSON($srcJSON);
         $this->assertInstanceOf($class, $inst);
-        $this->assertObjectEquals($inst, $expected);
+        $this->assertObjectEquals(
+            $inst,
+            $expected,
+            'equals',
+            sprintf(
+                "Expected:\n  Class: %s\n  Object: %s\n\nActual:\n  Class: %s\n  Object:%s",
+                $expected::class,
+                var_export($expected, true),
+                $inst::class,
+                var_export($inst, true),
+            )
+        );
     }
 
     public function testUnmarshal_String()
@@ -87,6 +100,21 @@ class UnmarshallerTest extends TestCase
         $this->executeUnmarshalFieldTest(
             TestArrayStringField::class,
             '{"var":["one","two"]}',
+            $expected
+        );
+    }
+
+    public function testUnmarshal_Object()
+    {
+        $expected             = new TestObjectField();
+        $expected->var        = new varClass();
+        $expected->var->str   = 'value';
+        $expected->var->int   = 1;
+        $expected->var->float = 1.1;
+        $expected->var->bool  = true;
+        $this->executeUnmarshalFieldTest(
+            TestObjectField::class,
+            '{"var":{"str":"value","int":1,"float":1.1,"bool":true}}',
             $expected
         );
     }

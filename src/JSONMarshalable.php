@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DCarbone\Go\JSON\Tests\Types;
+namespace DCarbone\Go\JSON;
 
 /*
    Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
@@ -20,24 +20,11 @@ namespace DCarbone\Go\JSON\Tests\Types;
    limitations under the License.
  */
 
-use DCarbone\Go\JSON\JSONMarshalable;
-use DCarbone\Go\JSON\JSONUnmarshalable;
-use DCarbone\Go\JSON\MarshalJSON;
-use DCarbone\Go\JSON\Transcoding;
-use DCarbone\Go\JSON\Type;
-use DCarbone\Go\JSON\UnmarshalJSON;
-
-final class TestIntegerField implements JSONUnmarshalable, JSONMarshalable
+interface JSONMarshalable
 {
-    use MarshalJSON;
-    use UnmarshalJSON;
-    use SimpleVarComparatorTrait;
-
-    protected const FIELDS = [
-        'var' => [
-            Transcoding::FIELD_TYPE => Type::INTEGER,
-        ],
-    ];
-
-    public int $var;
+    /**
+     * @param int $flags
+     * @return string
+     */
+    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string;
 }

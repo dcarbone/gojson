@@ -38,20 +38,6 @@ final class Transcoding
     public const FIELD_MARSHAL_CALLBACK   = 7;
     public const FIELD_MARSHAL_SKIP       = 8;
 
-
-    public const FIELD_QUERY_META = 'QueryMeta';
-    public const FIELD_WRITE_META = 'WriteMeta';
-    public const FIELD_ERR        = 'Err';
-
-    public const UNMARSHAL_TIME              = [self::class, 'unmarshalTime'];
-    public const UNMARSHAL_NULLABLE_TIME     = [self::class, 'unmarshalNullableTime'];
-    public const UNMARSHAL_DURATION          = [self::class, 'unmarshalDuration'];
-    public const UNMARSHAL_NULLABLE_DURATION = [self::class, 'unmarshalNullableDuration'];
-
-    //-- common field type definitions
-
-//    public const MAP_FIELD      = [self::FIELD_TYPE => self::OBJECT, self::FIELD_CLASS => FakeMap::class];
-
     //-- common field type definitions with omitempty
 
     public const OMITEMPTY_FIELD = [self::FIELD_OMITEMPTY => true];
@@ -68,5 +54,12 @@ final class Transcoding
         self::FIELD_TYPE       => Type::ARRAY,
         self::FIELD_ARRAY_TYPE => Type::INTEGER,
     ] + self::OMITEMPTY_FIELD;
-//    public const OMITEMPTY_MAP_FIELD = self::MAP_FIELD + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_FLOAT_ARRAY_FIELD = [
+        self::FIELD_TYPE       => Type::ARRAY,
+        self::FIELD_ARRAY_TYPE => Type::FLOAT,
+    ] + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_BOOLEAN_ARRAY_FIELD = [
+        self::FIELD_TYPE       => Type::ARRAY,
+        self::FIELD_ARRAY_TYPE => Type::BOOLEAN,
+    ] + self::OMITEMPTY_FIELD;
 }

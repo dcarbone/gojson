@@ -8,15 +8,15 @@ The [Transcoding](src/Transcoding.php) class is a container for this package's c
 
 ## Unmarshaller trait
 
-The [Unmarshaller](src/Unmarshaller.php) trait is intended to be embedded within any class that you wish to unmarshall
+The [Unmarshaller](src/UnmarshalJSON.php) trait is intended to be embedded within any class that you wish to unmarshall
 from JSON. As a basic example:
 
 ```php
 use DCarbone\Go\JSON\Transcoding;
-use DCarbone\Go\JSON\Unmarshaller;
+use DCarbone\Go\JSON\UnmarshalJSON;
 
 class Classname {
-    use Unmarshaller;
+    use UnmarshalJSON;
     
     protected const FIELDS = [
         'stringField' => [
@@ -47,14 +47,14 @@ EOT
 
 ## Marshaller trait
 
-The [Marshaller](src/Marshaller.php) trait is intended to be embedded within any class that you wish to marshall to
+The [Marshaller](src/MarshalJSON.php) trait is intended to be embedded within any class that you wish to marshall to
 JSON. As a basic example:
 
 ```php
 use DCarbone\Go\JSON\Transcoding;
 
 class Classname {
-    use \DCarbone\Go\JSON\Marshaller;
+    use \DCarbone\Go\JSON\MarshalJSON;
     
     protected const FIELDS = [
         'stringField' => [

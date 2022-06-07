@@ -27,17 +27,48 @@ use DCarbone\Go\JSON\Transcoding;
 use DCarbone\Go\JSON\Type;
 use DCarbone\Go\JSON\UnmarshalJSON;
 
-final class TestIntegerField implements JSONUnmarshalable, JSONMarshalable
+class varClass implements JSONUnmarshalable, JSONMarshalable
 {
     use MarshalJSON;
     use UnmarshalJSON;
-    use SimpleVarComparatorTrait;
+
+    protected const FIELDS = [
+        'str' => [
+            Transcoding::FIELD_TYPE => Type::STRING,
+        ],
+        'int' => [
+            Transcoding::FIELD_TYPE => Type::INTEGER,
+        ],
+        'float' => [
+            Transcoding::FIELD_TYPE => Type::FLOAT,
+        ],
+        'bool' => [
+            Transcoding::FIELD_TYPE => Type::BOOLEAN,
+        ]
+    ];
+
+    public string $str;
+    public int $int;
+    public float $float;
+    public bool $bool;
+}
+
+final class TestObjectField implements JSONUnmarshalable, JSONMarshalable
+{
+    use MarshalJSON;
+    use UnmarshalJSON;
 
     protected const FIELDS = [
         'var' => [
-            Transcoding::FIELD_TYPE => Type::INTEGER,
-        ],
+            Transcoding::FIELD_TYPE  => Type::OBJECT,
+            Transcoding::FIELD_CLASS => varClass::class,
+        ]
     ];
 
-    public int $var;
+    public varClass $var;
+
+    public function equals(self $other): bool
+    {
+        return (array)$this->var === (array)$other->var;
+    }
 }
