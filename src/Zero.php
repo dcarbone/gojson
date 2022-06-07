@@ -34,7 +34,40 @@ class Zero
     public static ZeroStates $zeroStates;
 
     /**
-     * TODO: provide test for whether zero after array_filter?
+     * @param string $type
+     * @param mixed $value
+     * @return array|bool|float|int|string|void
+     */
+    public static function forType(string $type, $value)
+    {
+        switch ($type) {
+            case Type::STRING:
+                return Zero::STRING;
+            case Type::INTEGER:
+                return Zero::INTEGER;
+            case Type::DOUBLE:
+                return Zero::DOUBLE;
+            case Type::BOOLEAN:
+                return Zero::BOOLEAN;
+            case Type::ARRAY:
+                return Zero::ARRAY;
+
+            case Type::OBJECT:
+                $zs = self::$zeroStates->getClass($value);
+                if (null === $zs) {
+                    return Zero::OBJECT;
+                }
+                return $zs->zeroVal();
+
+            case Type::RESOURCE:
+                return null;
+
+            default:
+                throw new \UnexpectedValueException(sprintf('Zero val for type "%s" is not defined', gettype($type)));
+        }
+    }
+
+    /**
      * TODO: resources will currently always return non-zero.
      *
      * @param mixed $value

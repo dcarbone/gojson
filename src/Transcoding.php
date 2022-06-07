@@ -69,5 +69,4 @@ final class Transcoding
         self::FIELD_ARRAY_TYPE => Type::INTEGER,
     ] + self::OMITEMPTY_FIELD;
 //    public const OMITEMPTY_MAP_FIELD = self::MAP_FIELD + self::OMITEMPTY_FIELD;
-
 }

@@ -20,6 +20,7 @@ namespace DCarbone\Go\JSON\Tests;
    limitations under the License.
  */
 
+use DCarbone\Go\JSON\Tests\Types\TestArrayStringField;
 use DCarbone\Go\JSON\Tests\Types\TestBooleanField;
 use DCarbone\Go\JSON\Tests\Types\TestDoubleField;
 use DCarbone\Go\JSON\Tests\Types\TestIntegerField;
@@ -28,41 +29,52 @@ use PHPUnit\Framework\TestCase;
 
 class MarshallerTest extends TestCase
 {
-    public function testMarshalFields()
+    protected function executeMarshalTest(object $inst, string $expectedJSON)
     {
-        $TESTS = [
-            'string-field'  => [
-                'inst'     => TestStringField::UnmarshalJSON('{"var":"value"}'),
-                'expected' => [
-                    'json' => '{"var":"value"}',
-                ],
-            ],
-            'integer-field' => [
-                'inst'     => TestIntegerField::UnmarshalJSON('{"var":1}'),
-                'expected' => [
-                    'json' => '{"var":1}',
-                ],
-            ],
-            'double-field'  => [
-                'inst'     => TestDoubleField::UnmarshalJSON('{"var":1.1}'),
-                'expected' => [
-                    'json' => '{"var":1.1}',
-                ],
-            ],
-            'boolean-field' => [
-                'inst'     => TestBooleanField::UnmarshalJSON('{"var":true}'),
-                'expected' => [
-                    'json' => '{"var":true}',
-                ],
-            ],
-        ];
+        $this->assertIsObject($inst);
+        $json = $inst->MarshalJSON();
+        $this->assertIsString($json);
+        $this->assertJson($json);
+        $this->assertJsonStringEqualsJsonString($json, $expectedJSON);
+    }
 
-        foreach ($TESTS as $name => $test) {
-            $this->assertIsObject($test['inst']);
-            $json = $test['inst']->MarshalJSON();
-            $this->assertIsString($json);
-            $this->assertJson($json);
-            $this->assertJsonStringEqualsJsonString($json, $test['expected']['json']);
-        }
+    public function testMarshal_String()
+    {
+        $this->executeMarshalTest(
+            TestStringField::UnmarshalJSON('{"var":"value"}'),
+            '{"var":"value"}'
+        );
+    }
+
+    public function testMarshal_Integer()
+    {
+        $this->executeMarshalTest(
+            TestIntegerField::UnmarshalJSON('{"var":1}'),
+            '{"var":1}'
+        );
+    }
+
+    public function testMarshal_Float()
+    {
+        $this->executeMarshalTest(
+            TestDoubleField::UnmarshalJSON('{"var":1.1}'),
+            '{"var":1.1}'
+        );
+    }
+
+    public function testMarshal_Boolean()
+    {
+        $this->executeMarshalTest(
+            TestBooleanField::UnmarshalJSON('{"var":true}'),
+            '{"var":true}'
+        );
+    }
+
+    public function testMarshal_Array_String()
+    {
+        $this->executeMarshalTest(
+            TestArrayStringField::UnmarshalJSON('{"var":["one","two"]}'),
+            '{"var":["one","two"]}'
+        );
     }
 }

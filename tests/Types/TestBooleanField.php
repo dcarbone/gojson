@@ -22,16 +22,18 @@ namespace DCarbone\Go\JSON\Tests\Types;
 
 use DCarbone\Go\JSON\Marshaller;
 use DCarbone\Go\JSON\Transcoding;
+use DCarbone\Go\JSON\Type;
 use DCarbone\Go\JSON\Unmarshaller;
 
-class TestBooleanField
+final class TestBooleanField
 {
     use Marshaller;
     use Unmarshaller;
+    use SimpleVarComparatorTrait;
 
     protected const FIELDS = [
         'var' => [
-            Transcoding::FIELD_TYPE => Transcoding::BOOLEAN,
+            Transcoding::FIELD_TYPE => Type::BOOLEAN,
         ],
     ];
 

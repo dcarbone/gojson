@@ -93,25 +93,6 @@ trait Unmarshaller
     }
 
     /**
-     * @param string $type
-     * @return bool|float|int|string|null
-     */
-    protected static function scalarZeroVal(string $type)
-    {
-        if (Transcoding::STRING === $type) {
-            return Transcoding::ZERO_STRING;
-        } elseif (Transcoding::INTEGER === $type) {
-            return Transcoding::ZERO_INTEGER;
-        } elseif (Transcoding::DOUBLE === $type) {
-            return Transcoding::ZERO_DOUBLE;
-        } elseif (Transcoding::BOOLEAN === $type) {
-            return Transcoding::ZERO_BOOLEAN;
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * @param string $field
      * @param mixed $value
      * @param string $type
@@ -127,15 +108,15 @@ trait Unmarshaller
                 return null;
             } else {
                 // otherwise, return zero val for this type
-                return self::scalarZeroVal($type);
+                return Zero::forType($type, $value);
             }
-        } elseif (Transcoding::STRING === $type) {
+        } elseif (Type::STRING === $type) {
             return (string)$value;
-        } elseif (Transcoding::INTEGER === $type) {
+        } elseif (Type::INTEGER === $type) {
             return \intval($value, 10);
-        } elseif (Transcoding::DOUBLE === $type) {
+        } elseif (Type::DOUBLE === $type) {
             return (float)$value;
-        } elseif (Transcoding::BOOLEAN === $type) {
+        } elseif (Type::BOOLEAN === $type) {
             return (bool)$value;
         } else {
             // if we fall down to here, default to try to set the value to whatever it happens to be.
@@ -181,7 +162,7 @@ trait Unmarshaller
         $this->{$field} = $this->buildScalarValue(
             $field,
             $value,
-            isset($this->{$field}) ? \gettype($this->{$field}) : Transcoding::MIXED,
+            isset($this->{$field}) ? \gettype($this->{$field}) : Type::MIXED,
             $nullable
         );
     }
@@ -259,7 +240,7 @@ trait Unmarshaller
         // currently, the only supported array types are scalar or objects.  everything else will require
         // a custom callback for hydration purposes.
 
-        if (Transcoding::OBJECT === $type) {
+        if (Type::OBJECT === $type) {
             if (null === $class) {
                 throw new \DomainException(
                     sprintf(
@@ -350,9 +331,9 @@ trait Unmarshaller
             );
         }
 
-        if (Transcoding::OBJECT === $fieldType) {
+        if (Type::OBJECT === $fieldType) {
             $this->unmarshalObject($field, $value, $def);
-        } elseif (Transcoding::ARRAY === $fieldType) {
+        } elseif (Type::ARRAY === $fieldType) {
             $this->unmarshalArray($field, $value, $def);
         } else {
             // at this point, assume scalar

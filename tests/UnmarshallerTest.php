@@ -20,102 +20,74 @@ namespace DCarbone\Go\JSON\Tests;
    limitations under the License.
  */
 
+use DCarbone\Go\JSON\Tests\Types\TestArrayStringField;
 use DCarbone\Go\JSON\Tests\Types\TestBooleanField;
 use DCarbone\Go\JSON\Tests\Types\TestDoubleField;
 use DCarbone\Go\JSON\Tests\Types\TestIntegerField;
 use DCarbone\Go\JSON\Tests\Types\TestStringField;
-use DCarbone\Go\JSON\Transcoding;
 use PHPUnit\Framework\TestCase;
 
 class UnmarshallerTest extends TestCase
 {
-    private const TESTS = [
-        'string-field' => [
-            'class'    => TestStringField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": "value"}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::STRING,
-                'value' => 'value',
-            ],
-        ],
-        'integer-field' => [
-            'class'    => TestIntegerField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": 1}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::INTEGER,
-                'value' => 1,
-            ],
-        ],
-        'double-field' => [
-            'class'    => TestDoubleField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": 1.1}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::DOUBLE,
-                'value' => 1.1,
-            ],
-        ],
-        'boolean-field' => [
-            'class'    => TestBooleanField::class,
-            'json'     => // language=JSON
-                <<<EOT
-{"var": true}
-EOT,
-            'expected' => [
-                'field' => 'var',
-                'type'  => Transcoding::BOOLEAN,
-                'value' => true,
-            ],
-        ],
-    ];
-
-    public function testUnmarshalFields()
+    protected function executeUnmarshalFieldTest(string $class, string $srcJSON, object $expected)
     {
-        foreach (self::TESTS as $name => $test) {
-            $inst = $test['class']::UnmarshalJSON($test['json']);
-            $this->assertInstanceOf($test['class'], $inst);
-            $this->assertObjectHasAttribute($test['expected']['field'], $inst);
-            $fieldValue = $inst->{$test['expected']['field']};
-            switch ($test['expected']['type']) {
-                case Transcoding::STRING:
-                    $this->assertIsString($fieldValue);
-                    break;
-                case Transcoding::INTEGER:
-                    $this->assertIsInt($fieldValue);
-                    break;
-                case Transcoding::DOUBLE:
-                    $this->assertIsFloat($fieldValue);
-                    break;
-                case Transcoding::BOOLEAN:
-                    $this->assertIsBool($fieldValue);
-                    break;
-                case Transcoding::OBJECT:
-                    $this->assertIsObject($fieldValue);
-                    $this->assertInstanceOf($test['expected']['field_class'], $fieldValue);
-                    break;
-                case Transcoding::ARRAY:
-                    $this->assertIsArray($fieldValue);
-                    break;
+        $inst = $class::UnmarshalJSON($srcJSON);
+        $this->assertInstanceOf($class, $inst);
+        $this->assertObjectEquals($inst, $expected);
+    }
 
-                default:
-                    throw new \UnexpectedValueException(
-                        sprintf(
-                            'Unhandled test case: %s',
-                            var_export($test, true)
-                        )
-                    );
-            }
-        }
+    public function testUnmarshal_String()
+    {
+        $expected      = new TestStringField();
+        $expected->var = 'value';
+        $this->executeUnmarshalFieldTest(
+            TestStringField::class,
+            '{"var": "value"}',
+            $expected
+        );
+    }
+
+    public function testUnmarshal_Integer()
+    {
+        $expected      = new TestIntegerField();
+        $expected->var = 1;
+        $this->executeUnmarshalFieldTest(
+            TestIntegerField::class,
+            '{"var": 1}',
+            $expected
+        );
+    }
+
+    public function testUnmarshal_Float()
+    {
+        $expected      = new TestDoubleField();
+        $expected->var = 1.1;
+        $this->executeUnmarshalFieldTest(
+            TestDoubleField::class,
+            '{"var":1.1}',
+            $expected
+        );
+    }
+
+    public function testUnmarshal_Boolean()
+    {
+        $expected      = new TestBooleanField();
+        $expected->var = true;
+        $this->executeUnmarshalFieldTest(
+            TestBooleanField::class,
+            '{"var":true}',
+            $expected
+        );
+    }
+
+    public function testUnmarshal_Array_String()
+    {
+        $expected      = new TestArrayStringField();
+        $expected->var = ["one", "two"];
+        $this->executeUnmarshalFieldTest(
+            TestArrayStringField::class,
+            '{"var":["one","two"]}',
+            $expected
+        );
     }
 }
