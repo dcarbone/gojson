@@ -25,41 +25,28 @@ namespace DCarbone\Go\JSON;
  */
 final class Transcoding
 {
-    public const TRUE  = 'true';
-    public const FALSE = 'false';
-
-    public const FIELD_TYPE               = 0;
-    public const FIELD_CLASS              = 1;
-    public const FIELD_ARRAY_TYPE         = 2;
-    public const FIELD_NULLABLE           = 3;
-    public const FIELD_OMITEMPTY          = 4;
-    public const FIELD_MARSHAL_AS         = 5;
-    public const FIELD_UNMARSHAL_CALLBACK = 6;
-    public const FIELD_MARSHAL_CALLBACK   = 7;
-    public const FIELD_MARSHAL_SKIP       = 8;
-
     //-- common field type definitions with omitempty
 
-    public const OMITEMPTY_FIELD = [self::FIELD_OMITEMPTY => true];
+    public const OMITEMPTY_FIELD = [Field::OMITEMPTY => true];
 
-    public const OMITEMPTY_STRING_FIELD        = [self::FIELD_TYPE => Type::STRING] + self::OMITEMPTY_FIELD;
-    public const OMITEMPTY_INTEGER_FIELD       = [self::FIELD_TYPE => Type::INTEGER] + self::OMITEMPTY_FIELD;
-    public const OMITEMPTY_DOUBLE_FIELD        = [self::FIELD_TYPE => Type::DOUBLE] + self::OMITEMPTY_FIELD;
-    public const OMITEMPTY_BOOLEAN_FIELD       = [self::FIELD_TYPE => Type::BOOLEAN] + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_STRING_FIELD        = [Field::TYPE => Type::STRING] + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_INTEGER_FIELD       = [Field::TYPE => Type::INTEGER] + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_DOUBLE_FIELD        = [Field::TYPE => Type::DOUBLE] + self::OMITEMPTY_FIELD;
+    public const OMITEMPTY_BOOLEAN_FIELD       = [Field::TYPE => Type::BOOLEAN] + self::OMITEMPTY_FIELD;
     public const OMITEMPTY_STRING_ARRAY_FIELD  = [
-        self::FIELD_TYPE       => Type::ARRAY,
-        self::FIELD_ARRAY_TYPE => Type::STRING,
+        Field::TYPE       => Type::ARRAY,
+        Field::ARRAY_TYPE => Type::STRING,
     ] + self::OMITEMPTY_FIELD;
     public const OMITEMPTY_INTEGER_ARRAY_FIELD = [
-        self::FIELD_TYPE       => Type::ARRAY,
-        self::FIELD_ARRAY_TYPE => Type::INTEGER,
+        Field::TYPE       => Type::ARRAY,
+        Field::ARRAY_TYPE => Type::INTEGER,
     ] + self::OMITEMPTY_FIELD;
     public const OMITEMPTY_FLOAT_ARRAY_FIELD = [
-        self::FIELD_TYPE       => Type::ARRAY,
-        self::FIELD_ARRAY_TYPE => Type::FLOAT,
+        Field::TYPE       => Type::ARRAY,
+        Field::ARRAY_TYPE => Type::FLOAT,
     ] + self::OMITEMPTY_FIELD;
     public const OMITEMPTY_BOOLEAN_ARRAY_FIELD = [
-        self::FIELD_TYPE       => Type::ARRAY,
-        self::FIELD_ARRAY_TYPE => Type::BOOLEAN,
+        Field::TYPE       => Type::ARRAY,
+        Field::ARRAY_TYPE => Type::BOOLEAN,
     ] + self::OMITEMPTY_FIELD;
 }
