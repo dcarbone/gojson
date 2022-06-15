@@ -61,7 +61,7 @@ class Field
     private const _GOJSON_VERSION = 0;
 
     /** @var string */
-    public string $field;
+    public string $name;
 
     /** @var string */
     public string $type;
@@ -83,11 +83,11 @@ class Field
     public bool $nullable = false;
 
     /**
-     * @param string $field
+     * @param string $name
      */
-    public function __construct(string $field)
+    public function __construct(string $name)
     {
-        $this->field = $field;
+        $this->name = $name;
     }
 
 //    public function __serialize(): array
@@ -118,7 +118,7 @@ class Field
 //    }
 
     /**
-     * @param $class
+     * @param string|object$class
      * @param string|object $propertyName
      * @param array|null $def
      * @return \DCarbone\Go\JSON\Field
@@ -127,8 +127,7 @@ class Field
      */
     public static function forClassProperty($class, string $propertyName, ?array $def): Field
     {
-        $rp = new \ReflectionProperty($class, $propertyName);
-        return static::fromPropertyReflection($rp, $def);
+        return static::fromPropertyReflection(new \ReflectionProperty($class, $propertyName), $def);
     }
 
     /**
