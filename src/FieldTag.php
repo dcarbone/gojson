@@ -20,20 +20,29 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface ZeroStateInterface
+interface FieldTag
 {
-    /**
-     * Must return true if provided value is considered "zero"
-     *
-     * @param object $value
-     * @return bool
-     */
-    public function isZero(object $value): bool;
+    public const OMITEMPTY          = 'omitempty';
+    public const UNMARSHAL_CALLBACK = 'unmarshalCallback';
+    public const MARSHAL_CALLBACK   = 'marshalCallback';
+    public const SKIP               = 'skip';
+    public const JSON_NAME          = 'jsonName';
+    public const ARRAY_TYPE         = 'arrayType';
 
     /**
-     * Must return an example of an "empty" value of this type
-     *
-     * @return mixed
+     * @return string
      */
-    public function zeroVal();
+    public function name(): string;
+
+    /**
+     * @param mixed $value
+     * @return \DCarbone\Go\JSON\MarshalResult
+     */
+    public function marshal($value): MarshalResult;
+
+    /**
+     * @param mixed $value
+     * @return \DCarbone\Go\JSON\UnmarshalResult
+     */
+    public function unmarshal($value): UnmarshalResult;
 }

@@ -20,7 +20,11 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface JSONUnmarshalable
+final class MarshalResult
 {
-    public static function UnmarshalJSON(?string $json, int $jsonDecodeFlags = 0): object;
+    /** @var mixed */
+    public $value;
+
+    /** @var bool  */
+    public bool $continue = true;
 }

@@ -20,7 +20,10 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface JSONUnmarshalable
+use Psr\Cache\CacheItemPoolInterface;
+
+class FieldCache
 {
-    public static function UnmarshalJSON(?string $json, int $jsonDecodeFlags = 0): object;
+    /** @var \Psr\Cache\CacheItemPoolInterface */
+    private CacheItemPoolInterface $pool;
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2022 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,41 +22,6 @@ namespace DCarbone\Go\JSON;
 
 class Field
 {
-    //-- field meta ids
-    public const OMITEMPTY          = 0;
-    public const UNMARSHAL_CALLBACK = 1;
-    public const MARSHAL_CALLBACK   = 2;
-    public const SKIP               = 3;
-    public const JSON_NAME          = 4;
-    public const ARRAY_TYPE         = 5;
-
-    //-- field meta keys
-    private const KEY_OMITEMPTY          = 'omitempty';
-    private const KEY_UNMARSHAL_CALLBACK = 'unmarshalCallback';
-    private const KEY_MARSHAL_CALLBACK   = 'marshalCallback';
-    private const KEY_SKIP               = 'skip';
-    private const KEY_JSON_NAME          = 'jsonName';
-    private const KEY_ARRAY_TYPE         = 'arrayType';
-
-    //-- field key id -> name map
-    private const ID_TO_KEY = [
-        self::OMITEMPTY          => self::KEY_OMITEMPTY,
-        self::UNMARSHAL_CALLBACK => self::KEY_UNMARSHAL_CALLBACK,
-        self::MARSHAL_CALLBACK   => self::KEY_MARSHAL_CALLBACK,
-        self::SKIP               => self::KEY_SKIP,
-        self::JSON_NAME          => self::KEY_JSON_NAME,
-        self::ARRAY_TYPE         => self::KEY_ARRAY_TYPE,
-    ];
-
-    private const KEY_TO_ID = [
-        self::KEY_OMITEMPTY          => self::OMITEMPTY,
-        self::KEY_UNMARSHAL_CALLBACK => self::UNMARSHAL_CALLBACK,
-        self::KEY_MARSHAL_CALLBACK   => self::MARSHAL_CALLBACK,
-        self::KEY_SKIP               => self::SKIP,
-        self::KEY_JSON_NAME          => self::JSON_NAME,
-        self::KEY_ARRAY_TYPE         => self::ARRAY_TYPE,
-    ];
-
     /** @var int */
     private const _GOJSON_VERSION = 0;
 
@@ -118,7 +83,7 @@ class Field
 //    }
 
     /**
-     * @param string|object$class
+     * @param string|object $class
      * @param string|object $propertyName
      * @param array|null $def
      * @return \DCarbone\Go\JSON\Field
@@ -127,7 +92,7 @@ class Field
      */
     public static function forClassProperty($class, string $propertyName, ?array $def): Field
     {
-        return static::fromPropertyReflection(new \ReflectionProperty($class, $propertyName), $def);
+        return static::fromReflectionProperty(new \ReflectionProperty($class, $propertyName), $def);
     }
 
     /**
@@ -136,7 +101,7 @@ class Field
      * @return \DCarbone\Go\JSON\Field
      * @throws \Exception
      */
-    public static function fromPropertyReflection(\ReflectionProperty $rp, ?array $def): Field
+    public static function fromReflectionProperty(\ReflectionProperty $rp, ?array $def): Field
     {
         $fieldDef = new Field($rp->getName());
 

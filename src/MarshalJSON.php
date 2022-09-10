@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2022 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ trait MarshalJSON
             if (!defined(static::class . '::FIELDS') || !isset(static::FIELDS[$field])) {
                 $out[$field] = $value;
             } else {
-                JSONMarshaller::marshalField($out, $this, $field, $value, static::FIELDS[$field]);
+                JSONMarshallerImpl::marshalField($out, $this, $field, $value, static::FIELDS[$field]);
             }
         }
         return json_encode($out, $jsonEncodeFlags);
