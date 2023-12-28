@@ -1,5 +1,7 @@
 # gojson
 
+WIP: this is a work in progress, and not suitable for actual use at this time.
+
 PHP lib intended to assist in marshalling and unmarshalling JSON data from Golang-based services
 
 ## Transcoding class
