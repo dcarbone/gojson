@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021-2022 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-class UnmarshalResult
+interface ZeroValInterface
 {
-    /** @var mixed */
-    public $value;
-    /** @var bool */
-    public bool $continue = true;
+    /**
+     * Must return true if the value of this object is considered "zero"
+     *
+     * @return bool
+     */
+    public function isZero(): bool;
 }

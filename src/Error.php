@@ -20,20 +20,46 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface ZeroStateInterface
+class Error
 {
     /**
-     * Must return true if provided value is considered "zero"
+     * Human-readable error message
      *
-     * @param object $value
-     * @return bool
+     * @var string
      */
-    public function isZero(object $value): bool;
+    public string $message;
 
     /**
-     * Must return an example of an "empty" value of this type
-     *
-     * @return mixed
+     * @param string $message Human readable error message
      */
-    public function zeroVal(): mixed;
+    public function __construct(string $message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * @param string $f Format string
+     * @param ...$v $values
+     * @return \DCarbone\Go\JSON\Error
+     */
+    public static function Errorf(string $f, ...$v): Error
+    {
+        return new self(sprintf($f, ...$v));
+    }
+
+    /**
+     * @return string
+     */
+    public function Error(): string
+    {
+        return $this->message;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->message;
+    }
 }

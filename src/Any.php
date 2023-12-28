@@ -20,34 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-function UnmarshalJSON(string $json, &$any, int $opts = JSON_BIGINT_AS_STRING): ?Error
-{
-    if ($any === null) {
-        return new Error('$any must not be null');
-    }
-
-    if (0 === strlen($json)) {
-        return new Error('$json must not be empty');
-    }
-
-    $decoded = json_decode($json, false);
-    $err     = json_last_error();
-    if (JSON_ERROR_NONE !== $err) {
-        return new Error(json_last_error_msg());
-    }
-
-    if (Type::IsScalar($decoded)) {
-        return $any = $decoded;
-    }
-
-
-
-
-    if ($any instanceof Any) {
-
-    }
-
-    if (Type::OBJECT === $dt && $dt instanceof Any) {
-        if (Type::P)
-    }
-}
+/**
+ * This class is only to be used when the raw JSON value is desired, regardless of what the type may be
+ */
+final class Any {}

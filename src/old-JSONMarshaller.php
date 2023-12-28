@@ -20,7 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-abstract class JSONMarshallerImpl
+abstract class JSONMarshaller
 {
     /**
      * Marshal field is designed to replicate (to ao point) what Golang does during the json.Marshal call
@@ -61,7 +61,7 @@ abstract class JSONMarshallerImpl
         }
 
         // otherwise, handle value setting on a per-type basis
-        if (!Zero::isZero($value)) {
+        if (!ZeroVal::isZero($value)) {
             $output[$field] = $value;
         }
     }

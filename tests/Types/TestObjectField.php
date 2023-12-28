@@ -25,12 +25,12 @@ use DCarbone\Go\JSON\JSONUnmarshalable;
 use DCarbone\Go\JSON\MarshalJSON;
 use DCarbone\Go\JSON\Transcoding;
 use DCarbone\Go\JSON\Type;
-use DCarbone\Go\JSON\UnmarshalJSON;
+use DCarbone\Go\JSON\UnmarshalJSONTrait;
 
 class varClass implements JSONUnmarshalable, JSONMarshalable
 {
     use MarshalJSON;
-    use UnmarshalJSON;
+    use UnmarshalJSONTrait;
 
     protected const FIELDS = [
         'str' => [
@@ -56,7 +56,7 @@ class varClass implements JSONUnmarshalable, JSONMarshalable
 final class TestObjectField implements JSONUnmarshalable, JSONMarshalable
 {
     use MarshalJSON;
-    use UnmarshalJSON;
+    use UnmarshalJSONTrait;
 
     protected const FIELDS = [
         'var' => [

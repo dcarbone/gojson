@@ -23,7 +23,7 @@ namespace DCarbone\Go\JSON\FieldTag;
 use DCarbone\Go\JSON\FieldTag;
 use DCarbone\Go\JSON\MarshalResult;
 use DCarbone\Go\JSON\UnmarshalResult;
-use DCarbone\Go\JSON\Zero;
+use DCarbone\Go\JSON\ZeroVal;
 
 class OmitEmpty implements FieldTag
 {
@@ -42,7 +42,7 @@ class OmitEmpty implements FieldTag
     public function marshal($value): MarshalResult
     {
         $out = new MarshalResult();
-        if (Zero::isZero($value)) {
+        if (ZeroVal::isZero($value)) {
             $out->continue = false;
             return $out;
         }

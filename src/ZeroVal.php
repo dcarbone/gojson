@@ -20,7 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-class Zero
+class ZeroVal
 {
     public const STRING  = '';
     public const INTEGER = 0;
@@ -36,26 +36,26 @@ class Zero
     /**
      * @param string $type
      * @param mixed $value
-     * @return array|bool|float|int|string|void
+     * @return mixed
      */
-    public static function forType(string $type, $value)
+    public static function forType(string $type, mixed $value): mixed
     {
         switch ($type) {
             case Type::STRING:
-                return Zero::STRING;
+                return ZeroVal::STRING;
             case Type::INTEGER:
-                return Zero::INTEGER;
+                return ZeroVal::INTEGER;
             case Type::DOUBLE:
-                return Zero::DOUBLE;
+                return ZeroVal::DOUBLE;
             case Type::BOOLEAN:
-                return Zero::BOOLEAN;
+                return ZeroVal::BOOLEAN;
             case Type::ARRAY:
-                return Zero::ARRAY;
+                return ZeroVal::ARRAY;
 
             case Type::OBJECT:
                 $zs = self::$zeroStates->getClass($value);
                 if (null === $zs) {
-                    return Zero::OBJECT;
+                    return ZeroVal::OBJECT;
                 }
                 return $zs->zeroVal();
 
@@ -63,7 +63,7 @@ class Zero
                 return null;
 
             default:
-                throw new \UnexpectedValueException(sprintf('Zero val for type "%s" is not defined', gettype($type)));
+                throw new \UnexpectedValueException(sprintf('Zero val for type "%s" is not defined', $type));
         }
     }
 
@@ -73,9 +73,9 @@ class Zero
      * @param mixed $value
      * @return bool
      */
-    public static function isZero($value): bool
+    public static function isZero(mixed $value): bool
     {
-        // NULL and empty array are always zero'
+        // NULL and empty array are always zero
         if (null === $value || [] === $value) {
             return true;
         }
@@ -83,20 +83,22 @@ class Zero
         $type = \gettype($value);
 
         if (Type::STRING === $type) {
-            return Zero::STRING === $value;
+            return ZeroVal::STRING === $value;
         } elseif (Type::INTEGER === $type) {
-            return Zero::INTEGER === $value;
+            return ZeroVal::INTEGER === $value;
         } elseif (Type::DOUBLE === $type) {
-            return Zero::DOUBLE === $value;
+            return ZeroVal::DOUBLE === $value;
         } elseif (Type::BOOLEAN === $type) {
-            return Zero::BOOLEAN === $value;
+            return ZeroVal::BOOLEAN === $value;
         } elseif (Type::OBJECT === $type) {
-            if ($value instanceof \Countable) {
-                return 0 === \count($value);
+            if ($value instanceof ZeroValInterface) {
+                return $value->isZero();
             } elseif (null !== ($zs = static::$zeroStates->getClass($value))) {
                 return $zs->isZero($value);
+            } elseif ($value instanceof \Countable) {
+                return 0 === \count($value);
             } else {
-                return false;
+                return [] === \get_object_vars($value);
             }
         } else {
             return false;
@@ -104,6 +106,6 @@ class Zero
     }
 }
 
-if (!isset(Zero::$zeroStates)) {
-    Zero::$zeroStates = new ZeroStates();
+if (!isset(ZeroVal::$zeroStates)) {
+    ZeroVal::$zeroStates = new ZeroStates();
 }

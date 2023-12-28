@@ -82,7 +82,7 @@ abstract class JSONUnmarshaller
                 return null;
             } else {
                 // otherwise, return zero val for this type
-                return Zero::forType($type, $value);
+                return ZeroVal::forType($type, $value);
             }
         } elseif (Type::STRING === $type) {
             return (string)$value;
@@ -114,7 +114,7 @@ abstract class JSONUnmarshaller
                 return null;
             }
             // otherwise, check if class is registered with a custom zero state
-            $zs = Zero::$zeroStates->getClass($class);
+            $zs = ZeroVal::$zeroStates->getClass($class);
             if (null !== $zs) {
                 return $zs->zeroVal();
             }

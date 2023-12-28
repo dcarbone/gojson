@@ -34,7 +34,7 @@ class ZeroStates
      * @param \DCarbone\Go\JSON\ZeroStateInterface $state
      * @return void
      */
-    public function addClass($class, ZeroStateInterface $state): void
+    public function addClass(string|object $class, ZeroStateInterface $state): void
     {
         if (\is_object($class)) {
             $class = \get_class($class);
@@ -49,7 +49,7 @@ class ZeroStates
      * @param string|object $class
      * @return \DCarbone\Go\JSON\ZeroStateInterface|null
      */
-    public function getClass($class): ?ZeroStateInterface
+    public function getClass(string|object $class): ?ZeroStateInterface
     {
         if (\is_object($class)) {
             $class = \get_class($class);

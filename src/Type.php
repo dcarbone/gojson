@@ -34,4 +34,15 @@ final class Type
     public const NULL     = 'NULL';
 
     public const SCALAR = [self::STRING, self::INTEGER, self::DOUBLE, self::BOOLEAN];
+
+    /**
+     * Returns true if the provided type is a PHP scalar
+     *
+     * @param mixed $in
+     * @return bool
+     */
+    public static function IsScalar(mixed $in): bool
+    {
+        return in_array(gettype($in), self::SCALAR, true);
+    }
 }
