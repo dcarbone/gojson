@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,11 +20,10 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface JSONMarshalable
+interface Marshalable
 {
     /**
-     * @param int $flags
      * @return string
      */
-    public function MarshalJSON(int $flags = JSON_UNESCAPED_SLASHES): string;
+    public function MarshalGoJSON(): string;
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface JSONUnmarshalable
+interface Unmarshalable
 {
-    public static function UnmarshalJSON(?string $json, int $jsonDecodeFlags = 0): object;
+    public static function UnmarshalGoJSON(?string $json): ?object;
 }

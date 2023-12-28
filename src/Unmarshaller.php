@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,19 +20,14 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-/**
- * Used to assist with unmarshalling json responses
- *
- * Trait Unmarshaller
- */
-trait UnmarshalJSON
+trait Unmarshaller
 {
     /**s
      * @param string|null $json
      * @return static
      * @throws \ReflectionException
      */
-    public static function UnmarshalJSON(?string $json): object
+    public static function UnmarshalGoJSON(?string $json): object
     {
         // construct new instance of containing class
         $zs = Zero::$zeroStates->getZeroState(static::class);
@@ -71,7 +66,7 @@ trait UnmarshalJSON
             if ($fieldsDefined) {
                 $fieldDef = static::FIELDS[$field] ?? null;
             }
-            JSONUnmarshaller::unmarshalField($inst, $fieldDef, $field, $value);
+            Decoder::unmarshalField($inst, $fieldDef, $field, $value);
         }
         return $inst;
     }

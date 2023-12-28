@@ -6,19 +6,19 @@ PHP lib intended to assist in marshalling and unmarshalling JSON data from Golan
 
 ## Transcoding class
 
-The [Transcoding](src/Transcoding.php) class is a container for this package's constants and a few helper functions.
+The [Transcoding](./src/Transcoding.php) class is a container for this package's constants and a few helper functions.
 
 ## Unmarshaller trait
 
-The [Unmarshaller](src/UnmarshalJSON.php) trait is intended to be embedded within any class that you wish to unmarshall
+The [Unmarshaller](./src/Unmarshaller.php) trait is intended to be embedded within any class that you wish to unmarshall
 from JSON. As a basic example:
 
 ```php
 use DCarbone\Go\JSON\Transcoding;
-use DCarbone\Go\JSON\UnmarshalJSON;
+use DCarbone\Go\JSON\Unmarshaller;
 
 class Classname {
-    use UnmarshalJSON;
+    use Unmarshaller;
     
     protected const FIELDS = [
         'stringField' => [
@@ -37,7 +37,7 @@ class Classname {
     public float $floatField;
 }
 
-$inst = Classname::UnmarshalJSON(<<<EOT
+$inst = Classname::UnmarshalGoJSON(<<<EOT
 {
     "stringField": "value",
     "intField": 1,
@@ -49,14 +49,14 @@ EOT
 
 ## Marshaller trait
 
-The [Marshaller](src/MarshalJSON.php) trait is intended to be embedded within any class that you wish to marshall to
+The [Marshaller](src/Marshaller.php) trait is intended to be embedded within any class that you wish to marshall to
 JSON. As a basic example:
 
 ```php
 use DCarbone\Go\JSON\Transcoding;
 
 class Classname {
-    use \DCarbone\Go\JSON\MarshalJSON;
+    use \DCarbone\Go\JSON\Marshaller;
     
     protected const FIELDS = [
         'stringField' => [
@@ -79,7 +79,7 @@ class Classname {
 }
 
 $inst = new Classname();
-$json = $inst->MarshalJSON();
+$json = $inst->MarshalGoJSON();
 echo $json; // {"intField": 1}
 ```
 

@@ -41,7 +41,7 @@ class MarshallerTest extends TestCase
     public function testMarshal_String()
     {
         $this->executeMarshalTest(
-            TestStringField::UnmarshalJSON('{"var":"value"}'),
+            TestStringField::UnmarshalGoJSON('{"var":"value"}'),
             '{"var":"value"}'
         );
     }
@@ -49,7 +49,7 @@ class MarshallerTest extends TestCase
     public function testMarshal_Integer()
     {
         $this->executeMarshalTest(
-            TestIntegerField::UnmarshalJSON('{"var":1}'),
+            TestIntegerField::UnmarshalGoJSON('{"var":1}'),
             '{"var":1}'
         );
     }
@@ -57,7 +57,7 @@ class MarshallerTest extends TestCase
     public function testMarshal_Float()
     {
         $this->executeMarshalTest(
-            TestDoubleField::UnmarshalJSON('{"var":1.1}'),
+            TestDoubleField::UnmarshalGoJSON('{"var":1.1}'),
             '{"var":1.1}'
         );
     }
@@ -65,7 +65,7 @@ class MarshallerTest extends TestCase
     public function testMarshal_Boolean()
     {
         $this->executeMarshalTest(
-            TestBooleanField::UnmarshalJSON('{"var":true}'),
+            TestBooleanField::UnmarshalGoJSON('{"var":true}'),
             '{"var":true}'
         );
     }
@@ -73,7 +73,7 @@ class MarshallerTest extends TestCase
     public function testMarshal_Array_String()
     {
         $this->executeMarshalTest(
-            TestArrayStringField::UnmarshalJSON('{"var":["one","two"]}'),
+            TestArrayStringField::UnmarshalGoJSON('{"var":["one","two"]}'),
             '{"var":["one","two"]}'
         );
     }

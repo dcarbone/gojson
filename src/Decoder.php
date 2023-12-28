@@ -20,7 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-abstract class JSONUnmarshaller
+abstract class Decoder
 {
     /**
      * Attempts to unmarshal the provided value into the provided field on the implementing class

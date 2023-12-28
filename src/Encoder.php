@@ -20,7 +20,7 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-abstract class JSONMarshaller
+abstract class Encoder
 {
     /**
      * Marshal field is designed to replicate (to ao point) what Golang does during the json.Marshal call
