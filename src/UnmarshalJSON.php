@@ -35,7 +35,7 @@ trait UnmarshalJSON
     public static function UnmarshalJSON(?string $json): object
     {
         // construct new instance of containing class
-        $zs = Zero::$zeroStates->getClass(static::class);
+        $zs = Zero::$zeroStates->getZeroState(static::class);
         if (null !== $zs) {
             $inst = $zs->zeroVal();
         } else {
@@ -46,6 +46,12 @@ trait UnmarshalJSON
         // if null is provided, return zero val of class
         if (null === $json || '' === $json) {
             return $inst;
+        }
+
+        // at this point, we have data to be unmarshalled but we are not guaranteed to have an instance to work with
+        if (null === $inst) {
+            $rc   = new \ReflectionClass(static::class);
+            $inst = $rc->newInstanceWithoutConstructor();
         }
 
         $decoded = json_decode($json, true);

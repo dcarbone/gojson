@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,20 +20,19 @@ namespace DCarbone\Go\JSON;
    limitations under the License.
  */
 
-interface ZeroStateInterface
+interface ZeroVal
 {
     /**
-     * Must return true if provided value is considered "zero"
+     * Must return true if the current state of this object is "zero"
      *
-     * @param object $value
      * @return bool
      */
-    public function isZero(object $value): bool;
+    public function isZero(): bool;
 
     /**
-     * Must return an example of an "empty" value of this type
+     * Must return the zero value of this object type
      *
-     * @return mixed
+     * @return ?object
      */
-    public function zeroVal();
+    public function zeroVal(): ?object;
 }

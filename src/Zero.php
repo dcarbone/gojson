@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ class Zero
     /**
      * @param string $type
      * @param mixed $value
-     * @return array|bool|float|int|string|void
+     * @return mixed
      */
-    public static function forType(string $type, $value)
+    public static function forType(string $type, mixed $value): mixed
     {
         switch ($type) {
             case Type::STRING:
@@ -53,7 +53,10 @@ class Zero
                 return Zero::ARRAY;
 
             case Type::OBJECT:
-                $zs = self::$zeroStates->getClass($value);
+                if ($value instanceof ZeroVal) {
+                    return $value->zeroVal();
+                }
+                $zs = self::$zeroStates->getZeroState($value);
                 if (null === $zs) {
                     return Zero::OBJECT;
                 }
@@ -73,7 +76,7 @@ class Zero
      * @param mixed $value
      * @return bool
      */
-    public static function isZero($value): bool
+    public static function isZero(mixed $value): bool
     {
         // NULL and empty array are always zero'
         if (null === $value || [] === $value) {
@@ -91,12 +94,14 @@ class Zero
         } elseif (Type::BOOLEAN === $type) {
             return Zero::BOOLEAN === $value;
         } elseif (Type::OBJECT === $type) {
-            if ($value instanceof \Countable) {
-                return 0 === \count($value);
-            } elseif (null !== ($zs = static::$zeroStates->getClass($value))) {
+            if ($value instanceof ZeroVal) {
+                return $value->isZero();
+            } elseif (null !== ($zs = static::$zeroStates->getZeroState($value))) {
                 return $zs->isZero($value);
+            } elseif ($value instanceof \Countable) {
+                return 0 === \count($value);
             } else {
-                return false;
+                return [] === \get_object_vars($value);
             }
         } else {
             return false;

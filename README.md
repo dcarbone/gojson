@@ -94,3 +94,20 @@ echo $json; // {"intField": 1}
 |`FIELD_MARSHAL_AS`|`['string', 'integer', 'double', 'boolean']`|If specified, the value of this field will be type-cast to the defined type at time of marshal|
 |`FIELD_MARSHAL_CALLBACK`|Any representation of a callable|The object being marshalled, the field name, and the field's value are passed as arguments in that order|
 |`FIELD_MARSHAL_SKIP`|`[true, false]`|If true, field will not be marshalled out to JSON.|
+
+## "Zero" Values
+
+Every type in Golang has an accompanying "zero" value.  You can reference this 
+[Tour of Go](https://go.dev/tour/basics/12) chapter for some examples.
+
+This has significant impact when marshalling and unmarshalling Go types with JSON, as depending upon the configured
+struct tags, marshaller used, and field type, an otherwise "empty" field may still have a non-null value when accessed.
+
+To assist with this, this lib comes with a [Zero](./src/Zero.php) type that allows you to check if a given value is
+"zero" or not.
+
+### Custom Zero Values
+
+In some cases, `null` may not be desirable for a "zero-val" or "default" field on a type.  To that end, you may either
+implement the [ZeroVal](./src/ZeroVal.php) interface on the type directly, or register a 
+[ZeroState](./src/ZeroState.php) to the [Zero::$zeroStates](./src/Zero.php) static parameter.

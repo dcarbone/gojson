@@ -25,10 +25,13 @@ abstract class JSONUnmarshaller
     /**
      * Attempts to unmarshal the provided value into the provided field on the implementing class
      *
+     * @param object $inst
+     * @param array|null $def
      * @param string $field
      * @param mixed $value
+     * @throws \ReflectionException
      */
-    public static function unmarshalField(object $inst, ?array $def, string $field, $value): void
+    public static function unmarshalField(object $inst, ?array $def, string $field, mixed $value): void
     {
         // if the implementing class has some explicitly defined overrides
         if (null !== $def && [] !== $def) {
@@ -48,17 +51,15 @@ abstract class JSONUnmarshaller
         $rft = $rf->getType();
         $rftName = (string)$rft;
 
-        // if type isn't defined on class, try to set the value as whatever
+        // if type isn't defined on class, try to set the value as whatever the incoming value is.
         if (null === $rft) {
             $inst->{$field} = $value;
             return;
         }
 
-        $nullable = $rft->allowsNull() || Type::OBJECT === $rftName;
-
         // if the field is scalar, handle
-        if (in_array((string)$rft, Type::SCALAR, true)) {
-            $inst->{$field} = static::unmarshalScalar($inst, $field, $value, $rftName, $nullable);
+        if (in_array($rftName, Type::SCALAR, true)) {
+            static::unmarshalScalar($inst, $field, $value, $rftName, $rft->allowsNull());
             return;
         }
 
@@ -71,9 +72,9 @@ abstract class JSONUnmarshaller
      * @param mixed $value
      * @param string $type
      * @param bool $nullable
-     * @return bool|float|int|string
+     * @return bool|float|int|string|null
      */
-    private static function buildScalarValue(string $field, $value, string $type, bool $nullable)
+    private static function buildScalarValue(string $field, mixed $value, string $type, bool $nullable): bool|float|int|string|null
     {
         // if the incoming value is null...
         if (null === $value) {
@@ -114,7 +115,7 @@ abstract class JSONUnmarshaller
                 return null;
             }
             // otherwise, check if class is registered with a custom zero state
-            $zs = Zero::$zeroStates->getClass($class);
+            $zs = Zero::$zeroStates->getZeroState($class);
             if (null !== $zs) {
                 return $zs->zeroVal();
             }
@@ -135,15 +136,15 @@ abstract class JSONUnmarshaller
      * @param object $inst
      * @param string $field
      * @param mixed $value
-     * @param string $fieldType
+     * @param string $type
      * @param bool $nullable
      */
-    private static function unmarshalScalar(object $inst, string $field, $value, $): void
+    private static function unmarshalScalar(object $inst, string $field, mixed $value, string $type, bool $nullable): void
     {
         $inst->{$field} = static::buildScalarValue(
             $field,
             $value,
-            $fieldType,
+            $type,
             $nullable
         );
     }
@@ -153,7 +154,7 @@ abstract class JSONUnmarshaller
      * @param mixed $value
      * @param array $def
      */
-    private static function unmarshalObject(object $inst, string $field, $value, array $def): void
+    private static function unmarshalObject(object $inst, string $field, mixed $value, array $def): void
     {
         if (!isset($def[Transcoding::FIELD_CLASS])) {
             throw new \LogicException(
@@ -166,7 +167,7 @@ abstract class JSONUnmarshaller
             );
         }
 
-        static::{$field} = static::buildObjectValue(
+        $inst->{$field} = static::buildObjectValue(
             $field,
             $value,
             $def[Transcoding::FIELD_CLASS],
@@ -265,7 +266,7 @@ abstract class JSONUnmarshaller
      * @param mixed $value
      * @param array $def
      */
-    private static function unmarshalFromTags(string $field, $value, array $def): void
+    private static function unmarshalFromTags(object $inst, string $field,mixed  $value, array $def): void
     {
         // check if a callable has been defined
         if (isset($def[Transcoding::FIELD_UNMARSHAL_CALLBACK])) {

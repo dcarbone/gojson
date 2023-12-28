@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace DCarbone\Go\JSON;
 
 /*
-   Copyright 2021 Daniel Carbone (daniel.p.carbone@gmail.com)
+   Copyright 2021-2023 Daniel Carbone (daniel.p.carbone@gmail.com)
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,19 +22,15 @@ namespace DCarbone\Go\JSON;
 
 class ZeroStates
 {
-    /** @var \DCarbone\Go\JSON\ZeroStateInterface[] */
-    private array $states = [];
-
-    public function __construct()
-    {
-    }
+    /** @var \DCarbone\Go\JSON\ZeroState[] */
+    private array $_states = [];
 
     /**
      * @param string|object $class
-     * @param \DCarbone\Go\JSON\ZeroStateInterface $state
+     * @param \DCarbone\Go\JSON\ZeroState $state
      * @return void
      */
-    public function addClass($class, ZeroStateInterface $state): void
+    public function setState(string|object $class, ZeroState $state): void
     {
         if (\is_object($class)) {
             $class = \get_class($class);
@@ -42,14 +38,24 @@ class ZeroStates
         if (!is_string($class)) {
             throw new \InvalidArgumentException(sprintf('Value for $class must be instance of object or class name, saw %s', gettype($class)));
         }
-        $this->states[$class] = $state;
+        $this->_states[$class] = $state;
     }
 
     /**
      * @param string|object $class
-     * @return \DCarbone\Go\JSON\ZeroStateInterface|null
+     * @param object|null $zeroVal
+     * @return void
      */
-    public function getClass($class): ?ZeroStateInterface
+    public function setStateValue(string|object $class, ?object $zeroVal): void
+    {
+        $this->setState($class, new ComparisonOperatorZeroState($zeroVal));
+    }
+
+    /**
+     * @param string|object $class
+     * @return \DCarbone\Go\JSON\ZeroState|null
+     */
+    public function getZeroState(string|object $class): ?ZeroState
     {
         if (\is_object($class)) {
             $class = \get_class($class);
@@ -57,6 +63,6 @@ class ZeroStates
         if (!is_string($class)) {
             throw new \InvalidArgumentException(sprintf('Value for $class must be instance of object or class name, saw %s', gettype($class)));
         }
-        return $this->states[$class] ?? null;
+        return $this->_states[$class] ?? null;
     }
 }
